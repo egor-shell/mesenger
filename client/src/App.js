@@ -12,10 +12,10 @@ function App() {
   return (
     <Router>
       <Link to="/">Домой</Link>
-      <Link to="/login">Войти</Link>
+      <Link to="/testAPI">Войти</Link>
       <Link to="/register">Регистрация</Link>
       <Switch>
-        <Route path="/login">
+        <Route path="/testAPI">
           <Login />
         </Route>
         <Route path="/register">
