@@ -2,10 +2,15 @@ import React from 'react';
 import "./MessageField.css"
 import Message from "../Message/Message";
 import { useRef, useEffect} from "react";
-import PropTypes from 'prop-types'
+import { useSelector } from 'react-redux'
 
-function MessageField(props) {
+import { selectChatId, selectMessages, selectChat} from '../../features/slice/messageSlice'
 
+function MessageField() {
+    const chatId = useSelector(selectChatId)
+    const messages = useSelector(selectMessages)
+    const chats = useSelector(selectChat)
+    const messagesInChat = messages.filter((item, id) => chats[chatId].messages.includes(id))
     const messagesEndRef = useRef(null)
 
     const scrollToBottom = () => {
@@ -14,20 +19,16 @@ function MessageField(props) {
 
     useEffect(() => {
         scrollToBottom()
-      }, [props.messages]);
+      }, [messages]);
 
     return (
         <div className="messageField">
             <div className="messageField__field">
-                { props.messages.map(({message, author}, index) => <React.Fragment key={index}><Message message={message} author={author}/></React.Fragment>)}
+                { messagesInChat.map(({message, author, id}, index) => <React.Fragment key={index}><Message message={message} author={author} id={id}/></React.Fragment>)}
                 <div ref={messagesEndRef} />
             </div>
         </div>
     );
-}
-
-MessageField.propTypes = {
-    messages: PropTypes.array.isRequired
 }
 
 export default MessageField;

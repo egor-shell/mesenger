@@ -6,15 +6,16 @@ import {
 } from "react-router-dom";
 
 import Layout from '../Layout/Layout';
-import Demo from '../demo'
+import Main from '../Main/Initial.js'
 
 function Routers() {
 
   return (
     <Router>
       <Switch>
-        <Route exact path='/' component={ Layout } />
-        <Route path='/chat/:chatId' component={ Demo } />
+        <Route exact path='/' component={ Main } />
+        <Route exact path='/chat' component={ Layout } />
+        <Route path='/chat/:chatId' component={ Layout } />
       </Switch>
     </Router>
   );

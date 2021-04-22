@@ -1,11 +1,15 @@
-import React from 'react'
+import React from 'react';
+import PropTypes from 'prop-types';
 
-function Header() {
+function Header(props) {
     return (
         <div>
-            <h2>ЧАТ</h2>
+            <h2>ЧАТ {props.chatId}</h2>
         </div>
     )
+}
+Header.propTypes = {
+    chatId: PropTypes.string
 }
 
 export default Header;

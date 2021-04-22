@@ -21,7 +21,9 @@ function SendMessage(props) {
     return (
         <div className="Send-field">
             <input className="Send-field__input" type="text" placeholder="Введите сообщение" value={message} onChange={event => sendMessage(event.target.value)} name='message' onKeyPress={handleKeyPress}></input>
-            <button className="Send-field__btn" onClick={() => send()}>
+            <button className="Send-field__btn" onClick={() => {
+                send()
+            }}>
                     <Icon width="2em" icon={sendIcon} />
             </button>
         </div>
@@ -29,7 +31,7 @@ function SendMessage(props) {
 }
 
 SendMessage.propTypes = {
-    send: PropTypes.object.isRequired
+    send: PropTypes.func.isRequired
 }
 
 export default SendMessage;
