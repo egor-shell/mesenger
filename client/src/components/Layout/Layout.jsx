@@ -1,83 +1,104 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect } from 'react';
 import {useSelector, useDispatch} from 'react-redux'
 import MessageField from '../MessageField/MessageField';
 import SendMessage from '../SendMessage/SendMessage';
 import Header from '../Header/Header';
-import ChatList from '../ChatList/ChatList';
-
+// import ChatList from '../ChatList/ChatList';
+import queryString from 'query-string'
+import io from 'socket.io-client'
 import {
-  getChatId,
   sender,
-  toChat,
+  // toChat,
   selectMessages,
-  selectChat
+  // selectChat,
+  getName,
+  getRoom,
+  selectName,
+  selectRooms
 } from '../../features/slice/messageSlice'
 
 import {
     Link,
-    useParams
   } from "react-router-dom";
 
-function Layout() {
-  const messages = useSelector(selectMessages)
-  const chats = useSelector(selectChat)
-  const dispatch = useDispatch()
-  function usePrevious(value) {
-    const ref = useRef();
-    useEffect(() => {
-      ref.current = value;
-    });
-    return ref.current;
-  }
-  const send = (objMsg) => {
-    const newMesId = messages.length
-    dispatch(sender({...objMsg, id: newMesId})),
-    dispatch(toChat(newMesId))
-  }
-  const prevMes = usePrevious(messages.length)
-  useEffect(() => {
-    if(prevMes < messages.length && messages[messages.length - 1].author === 'Me') {
-      const BOT_MESSAGE = {
-        message: 'I do not answer you. I am robot',
-        author: 'Bot',
-        id: messages.length
-      }
-      setTimeout(
-        () => {
-          dispatch(sender(BOT_MESSAGE))
-          dispatch(toChat(BOT_MESSAGE.id))
-        },
-        2000
-        );
-      }
-    })
-    const { chatId } = useParams()
-    console.log(chatId - 1)
-    dispatch(getChatId(chatId - 1))
+let socket
+
+// eslint-disable-next-line react/prop-types
+function Layout({ location }) {
+  const dispatch = useDispatch(),
+    messages = useSelector(selectMessages),
+    // [message, setMessage] = useState(''),
+    // chats = useSelector(selectChat),
+    // eslint-disable-next-line no-unused-vars
+    name = useSelector(selectName),
+    // eslint-disable-next-line no-unused-vars
+    rooms = useSelector(selectRooms),
+    ENDPOINT = 'http://192.168.0.7:5000',
+    // eslint-disable-next-line react/prop-types
+    naming = queryString.parse(location.search),
+    room = naming.room
     
-    if (!chatId) {
-      return (
-        <div className="App-field">
-          <Header />
-          <Link to="/">Главная</Link>
-          <div className="App-block">
-            <ChatList chats={chats} />
-          </div>
-        </div>
-      );
+  // function usePrevious(value) {
+  //   const ref = useRef();
+  //   useEffect(() => {
+  //     ref.current = value;
+  //   });
+  //   return ref.current;
+  // }
+  useEffect(() => {
+    // eslint-disable-next-line react/prop-types
+    const { name, room }= queryString.parse(location.search)
+
+    socket = io(ENDPOINT, {transports: ['websocket', 'polling', 'flashsocket']})
+
+    socket.emit('join', { name, room })
+
+    return () => {
+      socket.on('disconnect')
+
+      socket.off()
     }
-    return (
-      <div className="App-field">
-      <Header chatId={chatId}/>
-      <Link to="/chat">Главная</Link>
-      <div className="App-block">
-        <ChatList chats={chats} />
-        <div className="Message-Block">
-          <MessageField />
-          <SendMessage send={send} />
-        </div>
+  // eslint-disable-next-line react/prop-types
+  }, [ENDPOINT, location.search])
+  // const send = (objMsg) => {
+  //   const newMesId = messages.length
+  //   dispatch(sender({...objMsg, id: newMesId})),
+  //   dispatch(toChat(newMesId))
+  // }
+  const sendMessage = (objMsg) => {
+    if(objMsg) {
+      socket.emit('sendMessage', objMsg)
+    }
+    console.log(messages)
+  }
+  useEffect(() => {
+    socket.on('message', (message) => {
+      
+      // eslint-disable-next-line react/prop-types
+      const { name }= queryString.parse(location.search)
+      if(name.trim().toLowerCase() === message.author) {
+        message.author = 'Me'
+      }
+        dispatch(sender(message))
+      socket.off('message')
+    })
+  }, [messages])
+  return (
+    <div className="App-field">
+    <Header chatId={room}/>
+    <Link to="/">
+      <button onClick={() => dispatch(getName(''), getRoom(''), socket.disconnect())}>
+        Главная
+      </button>
+    </Link>
+    <div className="App-block">
+      {/* <ChatList chats={chats} /> */}
+      <div className="Message-Block">
+        <MessageField />
+        <SendMessage send={sendMessage} />
       </div>
     </div>
+  </div>
   );
 }
 export default Layout;

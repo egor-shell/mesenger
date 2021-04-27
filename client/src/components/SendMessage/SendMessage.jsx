@@ -9,7 +9,7 @@ function SendMessage(props) {
 
     
     const send = () => {
-        props.send({message: message, author: 'Me'})
+        props.send(message)
         sendMessage('')
     }
     
