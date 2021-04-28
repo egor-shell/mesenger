@@ -5,6 +5,7 @@ const express = require("express"),
     server = http.createServer(app),
     socketio = require('socket.io'),
     port = process.env.PORT || 5000,
+    cors = require('cors')
     // sequelize = require('./db'),
     io = socketio(server)
     router = require('./router'),
@@ -27,6 +28,16 @@ const express = require("express"),
 //         console.log(e)
 //     }
 // }
+app.use(cors())
+app.options('*', cors())
+const rooms = new Map()
+
+app.get('/rooms', (req, res) => {
+    res.json(rooms)
+})
+app.post('/rooms', (req, res) => {
+    console.log('Hello World!')
+})
 io.on('connection', (socket) => {
     console.log(`User connected: ${socket.id}`)
     socket.on('join', ({ name, room }, callback) => {
