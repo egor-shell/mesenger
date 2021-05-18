@@ -1,0 +1,5 @@
+.chatlist-list {
+    list-style-type: none;
+    display: flex;
+    flex-direction: column;
+}

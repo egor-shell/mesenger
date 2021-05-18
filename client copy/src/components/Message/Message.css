@@ -1,0 +1,34 @@
+.windows__message {
+    max-width: 50%;
+    display: flex;
+    flex-direction: column;
+}
+.message-info {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+    justify-content: space-between;
+}
+.message {
+    display: flex;
+    justify-content: space-around;
+    align-items: flex-end;
+    padding: 20px;
+    box-sizing: border-box;
+    border-radius: 30px;
+    margin-bottom: 10px;
+}
+.message__text {
+    margin: 0;
+    font-size: 24px;
+    color: whitesmoke;
+}
+.message__author {
+    font-size: 18px;
+}
+.message__time {
+    font-size: 14px;
+    margin: 0;
+    text-align: right;
+    background: rgba(255, 255, 255, 0.2);
+}
