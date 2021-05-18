@@ -1,0 +1,15 @@
+.messageField {
+    width: 100%;
+    box-sizing: border-box;
+    padding-left: 30px;
+    padding-right: 30px;
+    flex-grow: 1;
+    overflow-y: scroll;
+
+}
+.messageField__field {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    width: 100%;
+}

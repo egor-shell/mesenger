@@ -1,0 +1,10 @@
+{
+  "users": [
+    {
+      "username": "root",
+      "userId": "1",
+      "password": "root",
+      "email": "shell.egor.jesus@gmail.com"
+    }
+  ]
+}

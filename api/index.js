@@ -1,74 +1,54 @@
 require('dotenv').config()
 const express = require("express"),
     app = express(),
-    http = require('http'),
-    server = http.createServer(app),
-    socketio = require('socket.io'),
-    port = process.env.PORT || 5000,
-    cors = require('cors')
-    // sequelize = require('./db'),
-    io = socketio(server)
+    server = require('http').createServer(app),
+    io = require('socket.io')(server, {
+        cors: {
+            origin: "*",
+        }
+    }),
+    cors = require('cors'),
+    registerMessageHandlers = require('./handlers/messageHandlers'),
+    registerUserHandlers = require('./handlers/userHandlers'),
+    authRouter = require('./Routers/authRoute'),
     router = require('./router'),
-    { addUser, removeUser, getUser, getUsersInRoom } = require('./users')
+    { Users } = require('./models/user')
+    PORT = process.env.PORT || 5000,
+    log = console.log
 
-// const start = async () => {
-//     try {
-//         await sequelize.authenticate()
-//         await sequelize.sync()
-//         io.on('connection', (socket) => {
-//             console.log('New conncection')
+Users.init()
 
-//             socket.on('disconnect', () => {
-//                 console.log('User disconnect')
-//             })
-//         })
-//         app.use(router)
-//         server.listen(port, () => console.log("Backend server live on " + port))
-//     } catch (e) {
-//         console.log(e)
-//     }
-// }
 app.use(cors())
 app.options('*', cors())
-const rooms = new Map()
+app.use(express.json())
 
-app.get('/rooms', (req, res) => {
-    res.json(rooms)
-})
-app.post('/rooms', (req, res) => {
-    console.log('Hello World!')
-})
-io.on('connection', (socket) => {
-    console.log(`User connected: ${socket.id}`)
-    socket.on('join', ({ name, room }, callback) => {
-        const { error, user } = addUser({ id: socket.id, name, room })
+const onConnection = (socket) => {
+    log('User connected')
 
-        // if(error) return callback(error)
+    const { roomId } = socket.handshake.query
 
-        socket.emit('message', { message: `${user.name}, welcome to the room - ${user.room}`, author: 'Bot'})
-        socket.broadcast.to(user.room).emit('message', { message: `${user.name}, has joined`, author: 'Bot'})
+    socket.roomId = roomId
 
-        socket.join(user.room)
+    socket.join(roomId)
 
-        // callback()
-    })
-
-    socket.on('sendMessage', (message, callback) => {
-        const user = getUser(socket.id)
-
-        io.to(user.room).emit('message', { message: message, author: user.name})
-
-        // callback()
-    })
+    registerMessageHandlers(io, socket)
+    registerUserHandlers(io, socket)
 
     socket.on('disconnect', () => {
-        console.log('User disconnect')
+        log('User disconnect')
+
+        socket.leave(roomId)
     })
-})
+}
+
+io.on('connection', onConnection)
+
 app.use(router)
-server.listen(port, (err) => {
+app.use('/api/v1/auth', authRouter)
+
+server.listen(PORT, (err) => {
     if(err) {
         throw Error(err)
     }
-    console.log("Backend server live on " + port)
+    console.log("Backend server live on " + PORT)
 })
