@@ -1,6 +1,5 @@
 const { Users } = require('../models/user')
 const log = console.log
-const bcrypt = require('bcrypt')
 class auth {
     async registration(req, res) {
         try {
