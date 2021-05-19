@@ -1,6 +1,5 @@
 const users = {
-    1: { username: 'Bob', online: false },
-    2: { username: 'Alice', online: false },
+    
 }
 
 module.exports = (io, socket) => {

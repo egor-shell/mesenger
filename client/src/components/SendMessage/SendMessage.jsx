@@ -8,7 +8,7 @@ import './SendMessage.css'
 // import sendIcon from '@iconify/icons-ion/send';
 import PropTypes from 'prop-types';
 
-export const SendMessage = ({ name, send }) => {
+export const SendMessage = ({ username, send }) => {
     let [text, setText] = useState('')
     const [showEmoji, setShowEmoji] = useState(false)
 
@@ -17,7 +17,7 @@ export const SendMessage = ({ name, send }) => {
         event.preventDefault()
         const trimmed = text.trim()
         if(trimmed) {
-            send({ messageText: text, senderName: name})
+            send({ messageText: text, senderName: username})
             setText('')
         }
     }
@@ -73,6 +73,6 @@ export const SendMessage = ({ name, send }) => {
 }
 
 SendMessage.propTypes = {
-    name: PropTypes.string,
+    username: PropTypes.string,
     send: PropTypes.func.isRequired
 }

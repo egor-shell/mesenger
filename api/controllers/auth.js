@@ -1,60 +1,58 @@
-const { Users } = require('../models/user')
+const { User } = require('../models/user')
 const log = console.log
+const bcrypt = require('bcrypt')
+const jwt = require('jsonwebtoken')
+const config = require('../config')
+const ApiError = require('../error/ApiError')
+
+const generateJwt = (id, username, name, surname) => {
+    return jwt.sign(
+        {id, username, name, surname},
+        config.jwt.SECRET_KEY,
+        {expiresIn: '24h'}
+    )
+}
 class auth {
-    async registration(req, res) {
-        try {
-            await Users.createUser(req.body)
-            const users = await Users.getUsers()
-            res.send(users)
-        } catch (e) {
-            res.status(400).json(e)
+    async registration(req, res, next) {
+        const {username, password, email, name, surname} = req.body
+        if(!username || !password || !email || !name || !surname) {
+            return new Error(404, 'Некорректные данные')
         }
-    }
-    async getLogin(req, res) {
-        try {
-            await Users.getUserByUsername(req.body.username).then((user) => {
-                if (user) {
-                    if(user.password !== req.body.password) {
-                        res.send('Неправильный пароль')
-                    } else {
-                        res.send('ПОЛЬЗОВАТЕЛЬ ПРОШЁЛ ПРОВЕРКУ')
-                    }
-                } else {
-                    res.send('ПОЛЬЗОВАТЕЛЯ С ТАКИМ ИМЕНЕМ НЕ СУЩЕСТВУЕТ')
-                }
-            })
-            // res.send(users)
-        } catch (e) {
-            res.status(400).json('Упс... Что-то случилось')
+        let candidate = await User.findOne({ where: {username} })
+        log(candidate)
+
+        if(candidate) {
+            return next(ApiError.badRequest('Пользователь с таким именем уже существует'))
         }
-    }
-    async getUsers(req, res) {
-        try {
-            const users = await Users.getUsers()
-            console.log(users)
-            res.send(users)
-        } catch (e) {
-            res.status(400).json('Упс... Что-то случилось')
+        candidate = await User.findOne({ where: {email}})
+        log(candidate)
+
+        if(candidate) {
+            return next(ApiError.badRequest('Пользователь с таким email уже существует'))
         }
+        const hashPassword = await bcrypt.hash(password, 5)
+        const user = await User.create({username, password: hashPassword, email, name, surname})
+
+        const token = generateJwt(user.id, user.username, user.name, user.surname)
+        res.json({token})
     }
 
-    async getUserById(req, res) {
-        try {
-            const id = req.params.id
-            const user = await Users.getUserById(id)
-            // console.log(users)
-            res.json(user)
-        } catch (e) {
-            res.status(400).json('Упс... Что-то случилось')
+    async login(req, res, next) {
+        const {username, password} = req.body
+        const user = await User.findOne({where: {username: username}})
+        if(!user) {
+            return next(ApiError.internal('Пользователь с таким именем не найден'))
         }
+        let comparePassword = bcrypt.compareSync(password, user.password)
+        if(!comparePassword) {
+            return next(ApiError.internal('Неверный пароль'))
+        }
+        const token = generateJwt(user.id, user.username, user.name, user.surname)
+        return res.json({token})
     }
-    async updateUser(req, res) {
-        try {
-            await Users.updateUser(req.params.id, req.body)
-            res.json('Данные обновлены')
-        } catch (e) {
-            res.status(400).json('Упс... Что-то случилось')
-        }
+    async check(req, res, next) {
+        const token = generateJwt(user.id, user.username, user.email)
+        return res.json({token})
     }
 
 }

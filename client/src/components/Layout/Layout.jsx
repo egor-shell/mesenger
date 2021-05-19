@@ -1,20 +1,24 @@
 import React from 'react';
 import { useParams } from 'react-router-dom';
-import { useChat, useLocalStorage } from 'hooks'
+import { useChat } from 'hooks'
 import { Container } from 'react-bootstrap'
 import { Header, MessageField, SendMessage } from '../index'
+import { useSelector } from 'react-redux';
+import { selectUsername } from 'features/user/userSlice';
+// import { useEffect } from 'react';
 
 // eslint-disable-next-line react/prop-types
 export function Layout() {
   const { roomId } = useParams(),
-    name = useLocalStorage('name'),
+    username = useSelector(selectUsername),
     { messages, sendMessage, removeMessage } = useChat(roomId)
+
   return (
 
     <Container>
-      <Header chatId={roomId}/>
+      <Header />
       <MessageField messages={messages} removeMessage={removeMessage}/>
-      <SendMessage name={name} send={sendMessage} />
+      <SendMessage username={username} send={sendMessage} />
     </Container>
   );
 }

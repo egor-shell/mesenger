@@ -1,20 +1,22 @@
-import React from "react";
-import {
-  BrowserRouter as Router,
-  Switch,
-  Route
-} from "react-router-dom";
-import { Layout, Main } from '../index'
+import { Layout } from '../Layout/Layout'
 
-export function Routers() {
+import { LOGIN_ROUTE, REGISTRATION_ROUTE, MESSENGER_ROUTE } from "utils/urlpath";
+import Auth from '../Auth/Auth';
 
-  return (
-    <Router>
-      <Switch>
-        <Route exact path='/' component={ Main } />
-        <Route exact path='/:roomId' component={ Layout } />
-        {/* <Route path='/chat/:chatId' component={ Layout } /> */}
-      </Switch>
-    </Router>
-  );
-}
+export const authRoutes = [
+  {
+    path: MESSENGER_ROUTE,
+    Component: Layout
+  },
+]
+
+export const publicRoutes = [
+  {
+    path: LOGIN_ROUTE,
+    Component: Auth
+  },
+  {
+    path: REGISTRATION_ROUTE,
+    Component: Auth
+  }
+]

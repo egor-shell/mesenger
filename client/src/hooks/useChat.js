@@ -1,15 +1,19 @@
 import { useEffect, useRef, useState } from 'react'
 import io from 'socket.io-client'
-import { nanoid } from 'nanoid'
-import { useLocalStorage, useBeforeUnload } from 'react-use'
+// import { nanoid } from 'nanoid'
+import { useBeforeUnload } from 'react-use'
+import { useSelector } from 'react-redux'
+import { selectUsername, selectId } from 'features/user/userSlice'
 
 const SERVER_URL = 'http://192.168.0.7:5000'
 
 export const useChat = (roomId) => {
   const [users, setUsers] = useState([])
   const [messages, setMessages] = useState([])
-  const [userId] = useLocalStorage('userId', nanoid(8))
-  const [username] = useLocalStorage('username')
+  const username = useSelector(selectUsername)
+  const userId = useSelector(selectId)
+
+  console.log(username + ' ' + userId)
 
   const socketRef = useRef(null)
 

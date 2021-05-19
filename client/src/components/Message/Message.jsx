@@ -10,9 +10,8 @@ export const Message = ({ msg, removeMessage }) => {
         removeMessage(id)
     }
 
-    console.log(msg)
-
     const { messageId, messageText, senderName, createdAt, currentUser } = msg
+    console.log(msg.currentUser)
     return (
             <ListGroup.Item
                 className={`d-flex ${currentUser ? 'justify-content-end' : ''}`}
@@ -39,13 +38,6 @@ export const Message = ({ msg, removeMessage }) => {
                         )}
                     </Card.Body>
                 </Card>
-                {/* <div className="message-info">
-                    <a href='/' className='message__author'>{props.author}</a>
-                    <p className="message__time">{date.toLocaleString("ru", options)}</p>
-                </div>
-                <div className="message" style={{background: props.author === 'Me' ? 'rgb(20, 126, 251)' : 'rgb(83, 215, 105)'}}>
-                    <p className="message__text">{props.message}</p>
-                </div> */}
             </ListGroup.Item>
     );
 }
