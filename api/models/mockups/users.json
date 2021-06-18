@@ -4,6 +4,17 @@
     "password": "root",
     "email": "shell.egor.jesus@gmail.com",
     "name": "Егор",
-    "surname": "Шелудков"
+    "surname": "Шелудков",
+    "online": "false",
+    "socketId": ""
+  },
+  {
+    "username": "SHELL",
+    "password": "shell",
+    "email": "shell@email.com",
+    "name": "Egor",
+    "surname": "Shell",
+    "online": "false",
+    "socketId": ""
   }
 ]

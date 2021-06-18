@@ -1,28 +1,35 @@
-const users = {
-    
-}
+const { User } = require('../models/user')
+const users = {}
+
 
 module.exports = (io, socket) => {
-    const getUsers = () => {
-        io.in(socket.roomId).emit('users', users)
+    async function getUsers() {
+        const usersList = await User.findAll({ raw: true })
+        io.in(socket.roomId).emit('user', usersList)
     }
 
-    const addUser = ({ username, userId }) => {
-        if(!users[userId]) {
-            users[userId] = { username, online: true}
-        } else {
-            users[userId].online = true
-        }
+    async function addUser({ username, userId }) {
+        await User.update({ online: true, socketId: socket.id }, { where: { username }})
+        const user = await User.findOne({ where: { username }, raw: true})
+        console.log(user)
+        getUsers()
 
+    }
+
+    async function removeUser(userId) {
+        console.log(userId)
+        await User.update({ online: false, socketId: '' }, { where: { id: userId }})
+        const user = await User.findOne({ where: { id: userId }, raw: true})
+        console.log(user)
         getUsers()
     }
 
-    const removeUser = (userId) => {
-        users[userId].online = false
-        getUsers()
+    async function privateMessage(data) {
+        console.log(data)
     }
 
     socket.on('user:get', getUsers)
     socket.on('user:add', addUser)
     socket.on('user:leave', removeUser)
+    socket.on('privateMessage', privateMessage)
 }

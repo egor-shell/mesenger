@@ -2,10 +2,16 @@ import { authRoutes, publicRoutes } from '../Routers/Routers'
 import { selectValue } from '../../features/isAuth/isAuthSlice'
 import { React } from 'react'
 import { useSelector } from 'react-redux'
-import { Route, Switch } from 'react-router-dom'
+import { Redirect, Route, Switch, useLocation } from 'react-router-dom'
 
 export const AppRouter = () => {
     const isAuth = useSelector(selectValue)
+
+    let location = useLocation()
+    if(location.pathname === '/') {
+        return <Redirect to='/login' />
+    }
+    
     return (
         <Switch>
             {isAuth ?

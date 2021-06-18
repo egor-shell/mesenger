@@ -36,6 +36,14 @@ const User = sequelize.define('user', {
       type: DataTypes.STRING,
       allowNull: false
     },
+    online: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
+      defaultValue: false
+    },
+    socketId: {
+      type: DataTypes.STRING
+    }
 })
 
 class Users {

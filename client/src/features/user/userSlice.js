@@ -15,7 +15,6 @@ const userSlice = createSlice({
             state.username = action.payload
         },
         setDbName: (state, action) => {
-            console.log(action.payload)
             state.name = action.payload
         },
         setDbSurname: (state, action) => {

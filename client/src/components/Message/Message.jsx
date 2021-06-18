@@ -11,7 +11,6 @@ export const Message = ({ msg, removeMessage }) => {
     }
 
     const { messageId, messageText, senderName, createdAt, currentUser } = msg
-    console.log(msg.currentUser)
     return (
             <ListGroup.Item
                 className={`d-flex ${currentUser ? 'justify-content-end' : ''}`}

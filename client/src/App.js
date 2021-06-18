@@ -11,7 +11,7 @@ function App() {
 
   return (
     <Router>
-          <AppRouter />
+      <AppRouter />
     </Router>
   );
 }

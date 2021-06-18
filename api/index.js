@@ -23,10 +23,10 @@ app.options('*', cors())
 app.use(express.json())
 
 const onConnection = (socket) => {
-    log('User connected')
-
+    log(`User connected with id: ${socket.id}`)
+    
     const { roomId } = socket.handshake.query
-
+    
     socket.roomId = roomId
 
     socket.join(roomId)
