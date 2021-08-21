@@ -7,24 +7,37 @@ import './SendMessage.css'
 // import { Icon } from '@iconify/react';
 // import sendIcon from '@iconify/icons-ion/send';
 import PropTypes from 'prop-types';
+import { checkChats } from "http/userApi";
+import { useSelector } from "react-redux";
+import { selectUsersId } from "features/usersId/usersId";
+import { selectId } from "features/user/userSlice";
 
-export const SendMessage = ({ username, send }) => {
+export const SendMessage = ({ username, send, checkChat }) => {
     let [text, setText] = useState('')
     const [showEmoji, setShowEmoji] = useState(false)
+    const usersId = useSelector(selectUsersId)
+    const userId = useSelector(selectId)
 
     
     const sendMessage = event => {
         event.preventDefault()
         const trimmed = text.trim()
         if(trimmed) {
-            send({ messageText: text, senderName: username})
+            const message = {
+                messageText: text,
+                senderName: username,
+                userId: userId
+            }
+            send({usersId, message})
             setText('')
+            checkChat(usersId)
         }
     }
-    
+
     const handleKeyPress = event => {
         if(event.key === 'Enter'){
             sendMessage(event)
+            checkChats()
         }
     }
 
@@ -62,17 +75,12 @@ export const SendMessage = ({ username, send }) => {
                 </Form.Group>
             </Form>
             {showEmoji && <Picker onSelect={handleEmojiSelect} emojiSize={20} />}
-            {/* <input className="Send-field__input" type="text" placeholder="Введите сообщение" value={message} onChange={event => sendMessage(event.target.value)} name='message' onKeyPress={handleKeyPress}></input>
-            <button className="Send-field__btn" onClick={() => {
-                sendMessage()
-            }}>
-                    <Icon width="2em" icon={sendIcon} />
-            </button> */}
         </div>
     );
 }
 
 SendMessage.propTypes = {
     username: PropTypes.string,
-    send: PropTypes.func.isRequired
+    send: PropTypes.func.isRequired,
+    checkChat: PropTypes.func
 }

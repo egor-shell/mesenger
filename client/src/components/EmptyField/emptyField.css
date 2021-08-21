@@ -1,0 +1,9 @@
+.beginDialoge {
+    height: 75vh;
+    display: flex;
+    justify-content: center;
+    align-content: center;
+}
+.beginText{
+    align-self: center;
+}

@@ -6,10 +6,12 @@ import { logout } from '../../features/isAuth/isAuthSlice';
 import { useDispatch, useSelector } from 'react-redux';
 import { selectName, selectSurname, selectId } from '../../features/user/userSlice';
 import PropTypes from 'prop-types';
+import { selectUsersId } from 'features/usersId/usersId'
 
 export function Header({ sending, exit}) {
     const dispatch = useDispatch()
     const userId = useSelector(selectId)
+    const destinationId = useSelector(selectUsersId)
     const name = useSelector(selectName)
     const surname = useSelector(selectSurname)
     const fullName = name + ' ' + surname
@@ -19,16 +21,15 @@ export function Header({ sending, exit}) {
         exit(id)
     }
 
-    const handleSend = (id) => {
-        sending(id)
+    const handleSend = (sendingId, destId) => {
+        sending(sendingId, destId)
     }
     return (
         <div className='d-flex justify-content-between m-3'>
             <h2>{fullName}</h2>
             <Button
                 onClick={() => {
-                        console.log(userId)
-                        handleSend(userId)
+                        handleSend(userId, destinationId)
                     }
                 }
                 
@@ -39,7 +40,7 @@ export function Header({ sending, exit}) {
                 <Button
                     onClick={() => {
                             dispatch(logout())
-                            console.log(userId)
+                            localStorage.setItem('token', '')
                             handleExitUser(userId)
                         }
                     }

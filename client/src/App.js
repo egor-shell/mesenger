@@ -4,11 +4,9 @@ import {
 } from "react-router-dom";
 
 import './App.css';
-// import { Routers } from "components"
 import { AppRouter } from "components";
 
 function App() {
-
   return (
     <Router>
       <AppRouter />

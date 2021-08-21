@@ -4,6 +4,7 @@ const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
 const config = require('../config')
 const ApiError = require('../error/ApiError')
+const colors = require('colors')
 
 const generateJwt = (id, username, name, surname) => {
     return jwt.sign(
@@ -51,10 +52,16 @@ class auth {
         return res.json({token})
     }
     async check(req, res, next) {
-        const token = generateJwt(user.id, user.username, user.email)
-        return res.json({token})
+        const { username } = req.user
+        const user = await User.findOne({ where: { username: username }})
+        if(!user) {
+            return next(ApiError.internal('Неправильный токен'))
+        } else {
+            const token = generateJwt(user.id, user.username, user.name, user.surname)
+            console.log(colors.red(token))
+            return res.json({token})
+        }
     }
-
 }
 
 module.exports = new auth()

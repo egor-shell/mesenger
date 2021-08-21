@@ -43,6 +43,9 @@ const User = sequelize.define('user', {
     },
     socketId: {
       type: DataTypes.STRING
+    },
+    chats: {
+      type: DataTypes.JSON(DataTypes.JSON)
     }
 })
 

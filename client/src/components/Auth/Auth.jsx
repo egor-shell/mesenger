@@ -3,10 +3,15 @@ import React, { useState } from "react";
 import { Button, Card, Container, Form, Row } from 'react-bootstrap'
 import { NavLink, useHistory, useLocation } from 'react-router-dom';
 import { LOGIN_ROUTE, MESSENGER_ROUTE, REGISTRATION_ROUTE } from 'utils/urlpath';
-import { login, registration } from 'http/userApi';
+// import { registration } from 'http/userApi';
 import { useDispatch, useSelector } from 'react-redux';
 import { selectValue, auth, logout } from '../../features/isAuth/isAuthSlice';
 import { setDbUsername, setDbName, setDbSurname, reset, setDbId } from '../../features/user/userSlice'
+// import { useChat } from 'hooks';
+import { useMutation, useQuery } from '@apollo/client';
+import { GET_ALL_USERS } from 'query/user';
+import { LOGIN_USER, REGISTRATION_USER } from 'mutation/user';
+import jwtDecode from 'jwt-decode';
 
 const Auth = () => {
     const location = useLocation()
@@ -20,24 +25,78 @@ const Auth = () => {
     const [email, setEmail] = useState('')
     const [name, setName] = useState('')
     const [surname, setSurname] = useState('')
+    // const { getChats } = useChat('/im')
+    // eslint-disable-next-line no-unused-vars
+    const { data, loading, error } = useQuery(GET_ALL_USERS)
+    const [loginUser] = useMutation(LOGIN_USER)
+    const [registrationUser] = useMutation(REGISTRATION_USER)
+
+    React.useEffect(() => {
+        if(!loading) {
+            console.log(data)
+        }
+    }, [data])
+
+    const gqlClick = (e) => {
+        e.preventDefault()
+        loginUser({
+            variables: {
+                input: {
+                    username, password
+                }
+            }
+        }).then(({data}) => {
+            console.log(data)
+            setUsername('')
+            setPassword('')
+        })
+    }
 
     const click = async () => {
         try {
-            let data
+            // let data
+            let user
             if(isLogin) {
-                data = await login(username, password)
+                const { data } = await loginUser({
+                    variables: {
+                        input: {
+                            username, password
+                        }
+                    }
+                })
+                setUsername('')
+                setPassword('')
+                console.log(data.login.token)
+                localStorage.setItem('token', data.login.token)
+                user = jwtDecode(data.login.token)
+                console.log(user)
+                // getChats(data.id)
                 // dispatch(setDbUsername(data.username))
                 // dispatch(setDbName(data.name))
                 // dispatch(setDbSurname(data.surname))
             } else {
-                // eslint-disable-next-line no-unused-vars
-                data = await registration(username, password, email, name, surname)
-                
+                // data = await registration(username, password, email, name, surname)
+                const { data } = await registrationUser({
+                    variables: {
+                        input: {
+                            username, password, email, name, surname
+                        }
+                    }
+                })
+                setUsername('')
+                setPassword('')
+                setEmail('')
+                setName('')
+                setSurname('')
+                console.log(data)
+                localStorage.setItem('token', data.registration.token)
+                user = jwtDecode(data.registration.token)
+                console.log(user)
             }
-            dispatch(setDbId(data.id))
-            dispatch(setDbUsername(data.username))
-            dispatch(setDbName(data.name))
-            dispatch(setDbSurname(data.surname))
+            dispatch(setDbId(user.id))
+            dispatch(setDbUsername(user.username))
+            dispatch(setDbName(user.name))
+            dispatch(setDbSurname(user.surname))
             dispatch(auth())
             history.push(MESSENGER_ROUTE)
         } catch (e) {
@@ -45,6 +104,31 @@ const Auth = () => {
         }
 
     }
+    // const click = async () => {
+    //     try {
+    //         let data
+    //         if(isLogin) {
+    //             data = await login(username, password)
+    //             console.log(data)
+    //             // getChats(data.id)
+    //             // dispatch(setDbUsername(data.username))
+    //             // dispatch(setDbName(data.name))
+    //             // dispatch(setDbSurname(data.surname))
+    //         } else {
+    //             // eslint-disable-next-line no-unused-vars
+    //             data = await registration(username, password, email, name, surname)
+    //         }
+    //         dispatch(setDbId(data.id))
+    //         dispatch(setDbUsername(data.username))
+    //         dispatch(setDbName(data.name))
+    //         dispatch(setDbSurname(data.surname))
+    //         dispatch(auth())
+    //         history.push(MESSENGER_ROUTE)
+    //     } catch (e) {
+    //         dispatch(logout())
+    //     }
+
+    // }
 
     if(isAuth === false) {
         dispatch(reset())
@@ -81,6 +165,12 @@ const Auth = () => {
                                 onClick={click}
                             >
                                 Войти
+                            </Button>
+                            <Button 
+                                variant={'outline-success'}
+                                onClick={(e) => gqlClick(e)}
+                            >
+                                Отправить данные
                             </Button>
                         </Row>
                     </Form>

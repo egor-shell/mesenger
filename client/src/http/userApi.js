@@ -13,7 +13,12 @@ export const login = async (username, password) => {
     return jwt_decode(data.token)
 }
 export const check = async () => {
-    const {data} = await $host.post('/api/v1/auth/auth')
+    const token = localStorage.getItem('token')
+    const {data} = await $host.get('/api/v1/auth/auth', { headers: { Authorization: "Bearer " + token }})
     localStorage.setItem('token', data.token)
     return jwt_decode(data.token)
+}
+export const checkChats = async (userId) => {
+    const {data} = await $host.post('/api/v1/auth/chats', {userId})
+    return data.chats
 }

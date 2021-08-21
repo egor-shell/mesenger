@@ -1,5 +1,10 @@
+const { Chats } = require('./models/chat')
+
 require('dotenv').config()
 const express = require("express"),
+    {graphqlHTTP} = require('express-graphql'),
+    schema = require('./schema/usersSchema'),
+    { user } = require('./controllers/users') 
     app = express(),
     server = require('http').createServer(app),
     io = require('socket.io')(server, {
@@ -8,6 +13,7 @@ const express = require("express"),
         }
     }),
     cors = require('cors'),
+    cookieParser = require('cookie-parser'),
     registerMessageHandlers = require('./handlers/messageHandlers'),
     registerUserHandlers = require('./handlers/userHandlers'),
     authRouter = require('./Routers/authRoute'),
@@ -17,9 +23,16 @@ const express = require("express"),
     log = console.log
 
 Users.init()
+Chats.init()
 
 app.use(cors())
 app.options('*', cors())
+
+app.use('/graphql', graphqlHTTP({
+    graphiql: true,
+    schema,
+    rootValue: new user
+}))
 app.use(express.json())
 
 const onConnection = (socket) => {

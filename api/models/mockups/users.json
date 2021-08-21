@@ -1,20 +1,66 @@
 [
   {
     "username": "root",
+    "id": 1,
     "password": "root",
     "email": "shell.egor.jesus@gmail.com",
     "name": "Егор",
     "surname": "Шелудков",
     "online": "false",
-    "socketId": ""
+    "socketId": "",
+    "chats": [
+      {
+        "usersId": [
+          1, 2
+        ], 
+        "chatId": "rootShell",
+        "messagesLength": 2
+      },
+      {
+        "usersId": [
+          1, 3
+        ], 
+        "chatId": "rootChecked",
+        "messagesLength": 2
+      }
+    ]
   },
   {
     "username": "SHELL",
+    "id": 2,
     "password": "shell",
     "email": "shell@email.com",
     "name": "Egor",
     "surname": "Shell",
     "online": "false",
-    "socketId": ""
+    "socketId": "",
+    "chats": [
+      {
+        "usersId": [
+          1, 2
+        ], 
+        "chatId": "rootShell",
+        "messagesLength": 2
+      }
+    ]
+  },
+  {
+    "username": "Checked",
+    "id": 3,
+    "password": "checked",
+    "email": "checked@email.com",
+    "name": "Checked",
+    "surname": "Checked",
+    "online": "false",
+    "socketId": "",
+    "chats": [
+      {
+        "usersId": [
+          1, 3
+        ], 
+        "chatId": "rootChecked",
+        "messagesLength": 2
+      }
+    ]
   }
 ]
