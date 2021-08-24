@@ -129,6 +129,11 @@ const Auth = () => {
     //     }
 
     // }
+    const pressKey = (e) => {
+        if(e.key === 'Enter') {
+            click()
+        }
+    }
 
     if(isAuth === false) {
         dispatch(reset())
@@ -155,6 +160,7 @@ const Auth = () => {
                             type='password'
                             value={password}
                             onChange={e => setPassword(e.target.value)}
+                            onKeyDown={pressKey}
                         />
                         <Row className='d-flex justify-content-between mt-3 pl-3 pr-3'>
                             <div className='align-self-center'>

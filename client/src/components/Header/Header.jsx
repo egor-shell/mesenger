@@ -8,7 +8,7 @@ import { selectName, selectSurname, selectId } from '../../features/user/userSli
 import PropTypes from 'prop-types';
 import { selectUsersId } from 'features/usersId/usersId'
 
-export function Header({ sending, exit}) {
+export function Header({ sending, exit }) {
     const dispatch = useDispatch()
     const userId = useSelector(selectId)
     const destinationId = useSelector(selectUsersId)

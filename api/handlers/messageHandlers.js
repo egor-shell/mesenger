@@ -33,19 +33,6 @@ db.defaults({
 
 module.exports = (io, socket) => {
 
-    // const getMessages = async () => {
-    //     const chat = await Chat.findOne({
-    //         where: { chatId: currentChat.chatId },
-    //         raw: true
-    //     })
-    //     io.in(socket.roomId).emit('messages', chat.messages)
-    // }
-
-    // async function getMessages(chatId) {
-    //     console.log('GET_MESSAGES')
-    //     const chat = await Chat.findOne({ where: { chatId: chatId }, raw: true })
-    //     io.in(socket.roomId).emit('messages', chat.messages)
-    // }
     const getChats = async (userId) => {
         const chats = await Chat.findAll({
             raw: true
@@ -62,31 +49,48 @@ module.exports = (io, socket) => {
         io.to(socket.roomId).emit('chats', userChats)
     }
 
-    const addMessage = async (message) => {
+    const addMessage = async ({ usersId, chatId, userId, messageText, senderName }) => {
         let id = nanoid(8)
         let newMessage
-        const checkMessageId = async () => {
-            const chat = await Chat.findOne({ 
-                where: { chatId: currentChat.chatId }
+        let checkedChats = await Chat.findOne({
+            where: { chatId: chatId },
+            raw: true
+        })
+        if(checkedChats === null) {
+            checkedChats = await Chat.create({
+                usersId: usersId,
+                chatId: chatId,
+                messages: []
             })
-            const checked = chat.messages.find(checkedMessage => checkedMessage.messageId === id)
+        }
+
+        const checkMessageId = async () => {
+            // const chat = await Chat.findOne({
+            //     where: { chatId: currentChat.chatId }
+            // })
+            const checked = checkedChats.messages.find(checkedMessage => checkedMessage.messageId === id)
             while(checked) {
                 id = nanoid(8)
             }
-            newMessage = Object.assign({ messageId: id}, message)
+            newMessage = Object.assign({ messageId: id}, {userId, messageText, senderName})
         }
         await checkMessageId()
         
-        const chat = await Chat.update(
+        await Chat.update(
             { messages: sequelize.fn(
                 'array_append',
                 sequelize.col('messages'),
                 JSON.stringify(newMessage)
             )},
-            {where: { 
-                chatId: currentChat.chatId }
+            {where: {
+                chatId: chatId }
             }
         )
+        currentChat = await Chat.findOne({
+            where: { usersId: usersId },
+            raw: true
+        })
+        console.log(colors.bgBlue(currentChat))
 
         getChat(currentChat)
     }
@@ -129,8 +133,8 @@ module.exports = (io, socket) => {
         // }
     }
     async function getChat(data) {
-        console.log(colors.blue(data))
-        if(data.usersId !== null) {
+        console.log(colors.bgGreen(data))
+        if(data.usersId) {
             const checkChat = await data.usersId.sort((a, b) => {
                 return a - b
             })

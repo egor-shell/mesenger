@@ -31,22 +31,9 @@ export default function Users() {
     let usersChat = []
     let messages = []
 
-    // console.log(dataChat)
-
     if(dataChat && dataChat.getChat !== null) {
         messages = dataChat.getChat.messages
     }
-
-    // React.useEffect(() => {
-    //     if(!loadingChat) {
-    //         console.log(messages)
-    //         console.log(dataChat)
-
-    //         // setMessages(dataChat.getChat.messages.length)
-    //     }
-    // }, [dataChat])
-
-
 
     if(data) {
         users = data.getAllUsers
@@ -57,7 +44,6 @@ export default function Users() {
             if(chats) {
                 chats.map((chat) => {
                     if(chat) {
-                        console.log(chat)
                         const idUser = chat.usersId.find((id) => { 
                             return id !== userId
                         })
@@ -65,7 +51,6 @@ export default function Users() {
                     }
                 })
                 idUserChats.map((id) => {
-                    console.log(users)
                     let user = users.find((user) => user.id === String(id))
                     console.log(messages)
                     usersChat.push(user)
@@ -124,6 +109,8 @@ export default function Users() {
                                     dispatch(newChatId(chatId))
                                 } else {
                                     chatId = currentChat.chatId
+                                    dispatch(clearChatId())
+                                    dispatch(newChatId(chatId))
                                 }
                             }}
                             to={() => {

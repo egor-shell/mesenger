@@ -11,16 +11,26 @@ import { checkChats } from "http/userApi";
 import { useSelector } from "react-redux";
 import { selectUsersId } from "features/usersId/usersId";
 import { selectId } from "features/user/userSlice";
+import {useQuery} from "@apollo/client";
+import { GET_CHAT} from "../../query/user";
 
 export const SendMessage = ({ username, send, checkChat }) => {
     let [text, setText] = useState('')
     const [showEmoji, setShowEmoji] = useState(false)
     const usersId = useSelector(selectUsersId)
     const userId = useSelector(selectId)
+    const { refetch } = useQuery(GET_CHAT, {
+        variables: {
+            usersId: usersId
+        }
+    })
 
     
     const sendMessage = event => {
         event.preventDefault()
+        refetch().then(
+            () => console.log('REFETCH')
+        )
         const trimmed = text.trim()
         if(trimmed) {
             const message = {

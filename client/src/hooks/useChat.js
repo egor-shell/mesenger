@@ -1,7 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-
 import io from 'socket.io-client'
-// import { useBeforeUnload } from '../hooks/useBeforeUnload'
 import { useSelector, useDispatch } from 'react-redux'
 import { selectUsername, selectId } from 'features/user/userSlice'
 import { selectUsersId } from 'features/usersId/usersId'
@@ -9,7 +7,7 @@ import { newUsersInChat, clearUsersInChat } from 'features/usersInChat/usersInCh
 import { clearChatId, newChatId, selectChatId } from 'features/chatId/chatIdSlice'
 import { clearChats, newChats } from 'features/chats/chatsSlice'
 // import { pushing } from '../features/messages/messagesSlice'
-const SERVER_URL = 'http://192.168.0.7:5000'
+const SERVER_URL = 'http://192.168.0.4:5000'
 
 export const useChat = (roomId) => {
   // const [users, setUsers] = useState(null)
@@ -47,6 +45,7 @@ export const useChat = (roomId) => {
       dispatch(newChats(data))
     })
 
+    console.log(`%c${idChat}`, 'background: #222; color: #bada55')
     socketRef.current.emit('chat:get', {usersId: usersId, chatId: idChat})
 
     socketRef.current.on('chat', (data) => {
@@ -77,6 +76,7 @@ export const useChat = (roomId) => {
 
       })
       socketRef.current.on('chattt', (data) => {
+        console.log(data)
         if(data.messages) {
           const newMessages = data.messages.map((msg) => 
             msg.senderName === username ? { ...msg, currentUser: true } : msg
@@ -136,6 +136,7 @@ export const useChat = (roomId) => {
 
   // const sendMessage = ({ senderName, messageText }) => {
   const sendMessage = ({ usersId, message }) => {
+    console.log(`%c${usersId}`, 'color:yellow; background:black;')
     const {messageText, senderName} = message
     console.log('MESSAGES')
     console.log(messages)
@@ -143,6 +144,8 @@ export const useChat = (roomId) => {
     //   return socketRef.current.emit('chat:add', { senderName, messageText, userId })
     // }
     socketRef.current.emit('message:add', {
+      usersId,
+      chatId: idChat,
       userId,
       messageText,
       senderName
