@@ -20,7 +20,7 @@ export default function Users() {
     const usersId = useSelector(selectUsersId)
     const username = useSelector(selectUsername)
     let chatId = ''
-    const { data } = useQuery(GET_ALL_USERS)
+    const { data, refetch } = useQuery(GET_ALL_USERS)
     const { data: dataChat } = useQuery(GET_CHAT, {
         variables: {
             usersId: usersId
@@ -32,8 +32,14 @@ export default function Users() {
     let messages = []
 
     if(dataChat && dataChat.getChat !== null) {
+        /* eslint-disable no-unused-vars */
         messages = dataChat.getChat.messages
+        /* eslint-disable no-unused-vars */
     }
+
+    React.useEffect(() => {
+        refetch()
+    }, [])
 
     if(data) {
         users = data.getAllUsers
@@ -52,7 +58,6 @@ export default function Users() {
                 })
                 idUserChats.map((id) => {
                     let user = users.find((user) => user.id === String(id))
-                    console.log(messages)
                     usersChat.push(user)
                 })
     

@@ -47,7 +47,7 @@ class user {
             return new Error(404, 'Некоректные данные')
         }
 
-        let candidate = await User.findOne({ 
+        let candidate = await User.findOne({
             where: { username }
         })
 
@@ -73,7 +73,7 @@ class user {
             username: username,
             password: hashPassword,
             email: email,
-            name: name, 
+            name: name,
             surname: surname
         }).then(res => {
             return res.dataValues
@@ -110,6 +110,27 @@ class user {
         user.token = token
 
         return user
+    }
+
+    async addChat({input}) {
+        const { chatId, usersId } = input
+
+        console.log(colors.bgRed(chatId))
+        console.log(colors.bgRed(usersId))
+
+        usersId.map(async (userId) => {
+            const user = await User.findOne({
+                where: { id: userId },
+                raw: true
+            })
+
+            console.log(user.chats)
+
+            user.chats.push({usersId, chatId})
+
+            console.log(user.chats)
+
+        })
     }
 }
 

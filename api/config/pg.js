@@ -1,4 +1,4 @@
-const DB_NAME = 'shell_messenger'
+const DB_NAME = 'messenger'
 const DB_USER = 'postgres'
 const DB_PASSWORD = 'root'
 const DB_HOST = 'localhost'

@@ -5,6 +5,7 @@ const sequelize = require('./db')
 const config = require('../config')
 const path = require('path')
 const fs = require('fs')
+const { Material } = require('./info')
 
 const Chat = sequelize.define('chat', {
     id: {
@@ -40,16 +41,22 @@ class Chats {
         }).catch(err => log(`ОШИБКА ПРИ СОЗДАНИИ ТАБЛИЦЫ ЧАТОВ: ${err}`))
 
         if(config.db.loadMockupData) {
-            const filePath = path.join(__dirname, 'mockups/chats.json')
-            const mockups = JSON.parse(fs.readFileSync(filePath))
-            mockups.forEach(async (item) => {
-                await Chat.create(item).then(res => {
-                    log('МОКАП ЧАТА ЗАГРУЖЕН')
-                }).catch(err => log(`ОШИБКА ПРИ ЗАГРУЗКЕ МОКАПА ЧАТА: ${err}`))
+             const filePath = path.join(__dirname, 'mockups/chats.json')
+             const mockups = JSON.parse(fs.readFileSync(filePath))
+             mockups.map(async (item) => {
+                 await Chat.create(item).then(res => {
+                     log('МОКАП ЧАТА ЗАГРУЖЕН')
+                 }).catch(err => log(`ОШИБКА ПРИ ЗАГРУЗКЕ МОКАПА ЧАТА: ${err}`))
+                 const materialsChat = {
+                     chatId: item.chatId,
+                     messagesLength: item.messages.length
+                 }
+                 await Material.create(materialsChat).then(res => {
+                     log('МОКАП МАТЕРИАЛОВ СОЗДАН')
+                 }).catch(err => log(`ОШИБКА ПРИ ЗАГРУЗКЕ МОКАПА МАТЕРИАЛОВ: ${err}`))
             })
-        }
 
-        log('ТАБЛИЦА ЧАТОВ ПРОИНИЦИАЛИЗИРОВАНА')
+        }
     }
 }
 

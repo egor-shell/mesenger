@@ -15,3 +15,11 @@ export const REGISTRATION_USER = gql`
         }
     }
 `
+
+export const ADD_CHAT = gql`
+    mutation addChat($input: MessageInput) {
+        addChat(input: $input) {
+            username
+        }
+    }
+`

@@ -1,4 +1,5 @@
 const { Chats } = require('./models/chat')
+const { Materials } = require('./models/info')
 
 require('dotenv').config()
 const express = require("express"),
@@ -18,12 +19,13 @@ const express = require("express"),
     registerUserHandlers = require('./handlers/userHandlers'),
     authRouter = require('./Routers/authRoute'),
     router = require('./router'),
-    { Users } = require('./models/user')
+    { Users } = require('./models/user'),
     PORT = process.env.PORT || 5000,
     log = console.log
 
 Users.init()
 Chats.init()
+Materials.init()
 
 app.use(cors())
 app.options('*', cors())

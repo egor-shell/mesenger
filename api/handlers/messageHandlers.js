@@ -3,33 +3,11 @@ const colors = require('colors')
 
 const { Chat } = require('../models/chat'),
     { User } = require('../models/user'),
+    { Material } = require('../models/info'),
     { nanoid } = require('nanoid'),
-    low = require('lowdb'),
-    FileSync = require('lowdb/adapters/FileSync'),
-    adapter = new FileSync('db/messages.json'),
-    db = low(adapter),
     { Op } = require('sequelize')
 
 let currentChat = {}
-
-db.defaults({
-    messages: [
-        {
-        messageId: '1',
-        userId: '1',
-        senderName: 'Bob',
-        messageText: 'What are you doing here?',
-        createdAt: '2021-01-14'
-        },
-        {
-        messageId: '2',
-        userId: '2',
-        senderName: 'Alice',
-        messageText: 'Go back to work!',
-        createdAt: '2021-02-15'
-        }
-    ]
-}).write()
 
 module.exports = (io, socket) => {
 
@@ -62,6 +40,38 @@ module.exports = (io, socket) => {
                 chatId: chatId,
                 messages: []
             })
+
+            await Material.create({
+                chatId: chatId,
+                messagesLength: 0
+            })
+
+            const newChat = {
+                usersId: usersId,
+                chatId: chatId,
+                messagesLength: 1
+            }
+
+            usersId.map(async (id) => {
+                await User.update(
+                { chats: sequelize.fn(
+                    'array_append',
+                    sequelize.col('chats'),
+                    JSON.stringify(newChat)
+                )},
+                {where: {
+                    id: id }
+                }
+                )
+            })
+
+
+            const users = await User.findAll({
+                raw: true
+            })
+            users.map((user) => {
+                console.log(user.chats)
+            })
         }
 
         const checkMessageId = async () => {
@@ -86,6 +96,12 @@ module.exports = (io, socket) => {
                 chatId: chatId }
             }
         )
+
+        await Material.increment('messagesLength', {
+            where: {
+                chatId: chatId
+            }
+        })
         currentChat = await Chat.findOne({
             where: { usersId: usersId },
             raw: true
@@ -113,24 +129,9 @@ module.exports = (io, socket) => {
 
         if(chat) {
             getChat(chat)
-            // io.to(socket.roomId).emit('chattt', chat)
         } else {
             return
         }
-
-        // if(typeof data === 'string') {
-        //     console.log(colors.blue('NO CHAT'))
-        //     chat = await Chat.findOne({
-        //         where: { chatId: data}
-        //     })
-        // }
-        // } else {
-        //     console.log(colors.blue('CHAT'))
-        //     chat = await Chat.findOne({
-        //         where: { usersId: currentChat.usersId},
-        //         raw: true
-        //     })
-        // }
     }
     async function getChat(data) {
         console.log(colors.bgGreen(data))
@@ -168,60 +169,10 @@ module.exports = (io, socket) => {
                 usersId: currentChat.usersId, 
                 messages: []
             }, chat)
-
-            // await Chat.create(newChat).then(res => {
-            //     console.log(colors.red('НОВЫЙ ЧАТ СОЗДАН'))
-            // }).catch(err => console.log(err))
-    
-            // currentChat = newChat
-            // console.log(colors.red(currentChat.messages.length))
-            // await User.update({ 
-            //         chats: sequelize.fn(
-            //         'array_append',
-            //         sequelize.col('chats'),
-            //         JSON.stringify({usersId: currentChat.usersId, chatId: currentChat.chatId })
-            //         )
-            //     },
-            //     { where: {
-            //     id: currentChat.usersId.map(i => { return i })
-            //     }}
-            // )
         }
         io.in(socket.roomId).emit('chattt', currentChat)
         }
     }
-    // async function addChat(data) {
-
-    //     const chat = {}
-    //     const newChat = Object.assign({ 
-    //         chatId: currentChat.chatId, 
-    //         usersId: currentChat.usersId, 
-    //         messages: []
-    //     }, chat)
-
-    //     await Chat.create(newChat).then(res => {
-    //         console.log('НОВЫЙ ЧАТ СОЗДАН')
-    //     }).catch(err => console.log(err))
-
-    //     currentChat = newChat
-
-    //     const newMessage = data
-
-    //     // await User.update({ 
-    //     //     chats: sequelize.fn(
-    //     //     'array_append',
-    //     //     sequelize.col('chats'),
-    //     //     JSON.stringify({usersId: currentChat.usersId, chatId: currentChat.chatId})
-    //     // )},
-    //     // { where: {
-    //     //     id: currentChat.usersId.map(i => { return i })
-    //     // }}
-    //     // )
-    //     getChat(newChat)
-    //     checkChat()
-    //     addMessage(newMessage)
-
-    // }
 
     socket.on('chats:get', getChats)
     socket.on('message:add', addMessage)

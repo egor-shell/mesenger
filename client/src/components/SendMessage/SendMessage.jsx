@@ -12,7 +12,7 @@ import { useSelector } from "react-redux";
 import { selectUsersId } from "features/usersId/usersId";
 import { selectId } from "features/user/userSlice";
 import {useQuery} from "@apollo/client";
-import { GET_CHAT} from "../../query/user";
+import {GET_ALL_USERS, GET_CHAT} from "../../query/user";
 
 export const SendMessage = ({ username, send, checkChat }) => {
     let [text, setText] = useState('')
@@ -24,6 +24,7 @@ export const SendMessage = ({ username, send, checkChat }) => {
             usersId: usersId
         }
     })
+    const { refetch: usersRefetch} = useQuery(GET_ALL_USERS)
 
     
     const sendMessage = event => {
@@ -42,6 +43,7 @@ export const SendMessage = ({ username, send, checkChat }) => {
             setText('')
             checkChat(usersId)
         }
+        usersRefetch().then(() => console.log('USERS REFETCH'))
     }
 
     const handleKeyPress = event => {

@@ -45,7 +45,7 @@ const User = sequelize.define('user', {
       type: DataTypes.STRING
     },
     chats: {
-      type: DataTypes.JSON(DataTypes.JSON)
+      type: DataTypes.ARRAY(DataTypes.JSON)
     }
 })
 

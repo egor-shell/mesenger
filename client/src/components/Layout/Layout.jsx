@@ -21,7 +21,7 @@ export function Layout() {
       }
     });
 
-    React.useEffect(() => {
+  React.useEffect(() => {
       document.addEventListener("keydown", escFunction, false);
       const path = localStorage.getItem('path')
       window.onload = () => {

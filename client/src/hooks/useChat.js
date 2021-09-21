@@ -6,8 +6,11 @@ import { selectUsersId } from 'features/usersId/usersId'
 import { newUsersInChat, clearUsersInChat } from 'features/usersInChat/usersInChat'
 import { clearChatId, newChatId, selectChatId } from 'features/chatId/chatIdSlice'
 import { clearChats, newChats } from 'features/chats/chatsSlice'
+import {REACT_APP_API_URL} from "../config/apiUrl";
+import {useQuery} from "@apollo/client";
+import {GET_ALL_USERS} from "../query/user";
 // import { pushing } from '../features/messages/messagesSlice'
-const SERVER_URL = 'http://192.168.0.4:5000'
+const SERVER_URL = REACT_APP_API_URL
 
 export const useChat = (roomId) => {
   // const [users, setUsers] = useState(null)
@@ -20,6 +23,7 @@ export const useChat = (roomId) => {
   const idChat = useSelector(selectChatId)
   // const usersInChat = useSelector(selectUsersInChat)
   const dispatch = useDispatch()
+  const { refetch } = useQuery(GET_ALL_USERS)
 
   const socketRef = useRef(null)
 
@@ -35,6 +39,7 @@ export const useChat = (roomId) => {
     socketRef.current.emit('users:add', { username, userId })
 
     socketRef.current.on('users', (data) => {
+      console.log('USERS')
       setUsersList(data)
     })
 
@@ -45,7 +50,6 @@ export const useChat = (roomId) => {
       dispatch(newChats(data))
     })
 
-    console.log(`%c${idChat}`, 'background: #222; color: #bada55')
     socketRef.current.emit('chat:get', {usersId: usersId, chatId: idChat})
 
     socketRef.current.on('chat', (data) => {
@@ -76,7 +80,7 @@ export const useChat = (roomId) => {
 
       })
       socketRef.current.on('chattt', (data) => {
-        console.log(data)
+        refetch()
         if(data.messages) {
           const newMessages = data.messages.map((msg) => 
             msg.senderName === username ? { ...msg, currentUser: true } : msg
@@ -86,33 +90,6 @@ export const useChat = (roomId) => {
           setMessages([])
         }
       })
-    // socketRef.current.on('chattt', (data) => {
-    //   const chattingId = data.chatId
-    //   console.log(chattingId)
-    //   // if(chattingId === 'undefined') {
-    //   //   const chatId = data[2]
-    //   //     const usersList = []
-    //   //     data.map(i => {
-    //   //       if(typeof i === 'number') {
-    //   //         usersList.push(i)
-    //   //       }
-    //   //     })
-    //   //     console.log('DISPATCH')
-    //   //     dispatch(clearUsersInChat())
-    //   //     dispatch(newUsersInChat(usersList))
-    //   //     dispatch(clearChatId())
-    //   //     return dispatch(newChatId(chatId))  
-    //   //   } else if (chattingId !== 'undefined' && chattingId !== undefined) {
-    //   //     console.log('CHAT_ID !== UNDEFINED')
-    //   //     dispatch(clearChatId())
-    //   //     dispatch(newChatId(data.chatId))
-    //   //     const newMessages = data.messages.map((msg) =>
-    //   //       msg.senderName === username ? { ...msg, currentUser: true } : msg
-    //   //     )
-    //   //     setMessages(newMessages)
-    //   //   }
-
-    //   })
     socketRef.current.on('chat:find', (data) => {
       console.log('FIND')
       console.log(data)
@@ -140,9 +117,6 @@ export const useChat = (roomId) => {
     const {messageText, senderName} = message
     console.log('MESSAGES')
     console.log(messages)
-    // if(messages.length < 1) {
-    //   return socketRef.current.emit('chat:add', { senderName, messageText, userId })
-    // }
     socketRef.current.emit('message:add', {
       usersId,
       chatId: idChat,

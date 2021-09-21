@@ -50,11 +50,10 @@ const schema = buildSchema(`
         username: String!
         password: String!
     }
-
+    
     input ChatInput {
         usersId: [Int]
         chatId: String
-        messagesLength: Int
     }
 
     type Query {
@@ -66,6 +65,7 @@ const schema = buildSchema(`
     type Mutation {
         registration(input: registerUserInput): User
         login(input: loginUserInput): User
+        addChat(input: ChatInput): User
     }
 `)
 

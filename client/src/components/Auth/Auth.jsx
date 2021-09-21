@@ -15,7 +15,6 @@ import jwtDecode from 'jwt-decode';
 
 const Auth = () => {
     const location = useLocation()
-    // eslint-disable-next-line no-unused-vars
     const isAuth = useSelector(selectValue)
     const history = useHistory()
     const dispatch = useDispatch()

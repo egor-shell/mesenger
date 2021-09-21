@@ -45,7 +45,6 @@ export const MessageField = ({ messages, removeMessage }) => {
         refetch()
       }, [messages]);
 
-    console.log(dataChat)
 
     if(!dataChat || !dataChat.getChat) {
         return (
